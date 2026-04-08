@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Tailor</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --success: #16a34a;
+  --radius: 8px;
+  --mono: "SF Mono", "Cascadia Code", "Fira Code", Consolas, monospace;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+header { text-align: center; margin-bottom: 32px; }
+header h1 { font-size: 28px; font-weight: 700; color: var(--text); }
+header h1 span { color: var(--accent); }
+header p { color: var(--text-muted); font-size: 15px; margin-top: 4px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 768px) { .input-grid { grid-template-columns: 1fr; } }
+.input-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: border-color 0.15s;
+}
+.upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+.upload-btn svg { width: 14px; height: 14px; }
+.upload-name { font-size: 12px; color: var(--text-muted); }
+textarea {
+  width: 100%;
+  min-height: 260px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 0.15s;
+}
+textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+textarea::placeholder { color: var(--text-muted); }
+.options-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.checkbox-label input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+.checkbox-label.disabled { opacity: 0.45; cursor: not-allowed; }
+.checkbox-label.disabled input { pointer-events: none; }
+.badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 500;
+}
+.submit-row { margin-top: 20px; text-align: center; }
+#submitBtn {
+  padding: 12px 40px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+#submitBtn:hover:not(:disabled) { background: var(--accent-hover); }
+#submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#error {
+  display: none;
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #991b1b;
+  font-size: 14px;
+  text-align: center;
+}
+#results { display: none; }
+.result-section { margin-bottom: 20px; }
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.result-header h3 { font-size: 16px; font-weight: 600; }
+.copy-btn {
+  padding: 5px 12px;
+  font-size: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.15s;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { border-color: var(--success); color: var(--success); }
+pre.result-content {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-x: auto;
+  max-height: 500px;
+  overflow-y: auto;
+}
+.ats-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 600px) { .ats-card { grid-template-columns: 1fr; } }
+.ats-item {
+  text-align: center;
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.ats-item .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.ats-item .score { font-size: 32px; font-weight: 700; }
+.ats-item .score.before { color: var(--text-muted); }
+.ats-item .score.after { color: var(--accent); }
+.ats-item .score.improvement { color: var(--success); }
+.ats-bar-wrap { margin-top: 8px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.ats-bar { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.ats-bar.before-bar { background: var(--text-muted); }
+.ats-bar.after-bar { background: var(--accent); }
+.usage-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
+.usage-stats span { background: var(--bg); padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Resume <span>Tailor</span></h1>
+    <p>AI-powered resume tailoring — paste or upload your resume and a job description</p>
+  </header>
+
+  <div class="card">
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Your Resume</label>
+        <div class="upload-row">
+          <label class="upload-btn" for="resumeFile">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"/></svg>
+            Upload file
+          </label>
+          <input type="file" id="resumeFile" accept=".txt,.md,.pdf" hidden>
+          <span class="upload-name" id="resumeFileName"></span>
+        </div>
+        <textarea id="resumeText" placeholder="Paste your resume here, or upload a .txt / .md / .pdf file above..."></textarea>
+      </div>
+      <div class="input-group">
+        <label>Job Description</label>
+        <div class="upload-row">
+          <label class="upload-btn" for="jobFile">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"/></svg>
+            Upload file
+          </label>
+          <input type="file" id="jobFile" accept=".txt,.md,.pdf" hidden>
+          <span class="upload-name" id="jobFileName"></span>
+        </div>
+        <textarea id="jobText" placeholder="Paste the target job description here, or upload a file..."></textarea>
+      </div>
+    </div>
+
+    <div class="options-row">
+      <label class="checkbox-label {% if not has_cover_letter %}disabled{% endif %}">
+        <input type="checkbox" id="optCoverLetter" {% if not has_cover_letter %}disabled{% endif %}>
+        Generate Cover Letter
+        {% if not has_cover_letter %}<span class="badge">coming soon</span>{% endif %}
+      </label>
+      <label class="checkbox-label {% if not has_ats_score %}disabled{% endif %}">
+        <input type="checkbox" id="optAtsScore" {% if not has_ats_score %}disabled{% endif %}>
+        Show ATS Score
+        {% if not has_ats_score %}<span class="badge">coming soon</span>{% endif %}
+      </label>
+    </div>
+
+    <div class="submit-row">
+      <button id="submitBtn" type="button">
+        <span class="spinner" id="spinner"></span>
+        <span id="btnText">Tailor My Resume</span>
+      </button>
+    </div>
+    <div id="error"></div>
+  </div>
+
+  <div id="results">
+    <div class="card result-section" id="resumeResult">
+      <div class="result-header">
+        <h3>Tailored Resume</h3>
+        <button class="copy-btn" data-target="resumeContent">Copy</button>
+      </div>
+      <pre class="result-content" id="resumeContent"></pre>
+    </div>
+
+    <div class="card result-section" id="changesResult">
+      <div class="result-header">
+        <h3>Changes Made</h3>
+        <button class="copy-btn" data-target="changesContent">Copy</button>
+      </div>
+      <pre class="result-content" id="changesContent"></pre>
+    </div>
+
+    <div class="card result-section" id="atsResult" style="display:none;">
+      <div class="result-header">
+        <h3>ATS Keyword Score</h3>
+      </div>
+      <div class="ats-card">
+        <div class="ats-item">
+          <div class="label">Before</div>
+          <div class="score before" id="atsBefore">—</div>
+          <div class="ats-bar-wrap"><div class="ats-bar before-bar" id="atsBeforeBar" style="width:0%"></div></div>
+        </div>
+        <div class="ats-item">
+          <div class="label">After</div>
+          <div class="score after" id="atsAfter">—</div>
+          <div class="ats-bar-wrap"><div class="ats-bar after-bar" id="atsAfterBar" style="width:0%"></div></div>
+        </div>
+        <div class="ats-item">
+          <div class="label">Improvement</div>
+          <div class="score improvement" id="atsImprovement">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card result-section" id="coverLetterResult" style="display:none;">
+      <div class="result-header">
+        <h3>Cover Letter</h3>
+        <button class="copy-btn" data-target="coverLetterContent">Copy</button>
+      </div>
+      <pre class="result-content" id="coverLetterContent"></pre>
+    </div>
+
+    <div class="usage-stats" id="usageStats"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const resumeText = document.getElementById("resumeText");
+  const jobText = document.getElementById("jobText");
+  const resumeFile = document.getElementById("resumeFile");
+  const jobFile = document.getElementById("jobFile");
+  const resumeFileName = document.getElementById("resumeFileName");
+  const jobFileName = document.getElementById("jobFileName");
+  const submitBtn = document.getElementById("submitBtn");
+  const spinner = document.getElementById("spinner");
+  const btnText = document.getElementById("btnText");
+  const errorEl = document.getElementById("error");
+  const resultsEl = document.getElementById("results");
+
+  async function uploadFile(fileInput, textarea, nameSpan) {
+    const file = fileInput.files[0];
+    if (!file) return;
+    nameSpan.textContent = file.name;
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (data.error) {
+        showError(data.error);
+        return;
+      }
+      textarea.value = data.text;
+    } catch (e) {
+      showError("Failed to upload file: " + e.message);
+    }
+  }
+
+  resumeFile.addEventListener("change", () => uploadFile(resumeFile, resumeText, resumeFileName));
+  jobFile.addEventListener("change", () => uploadFile(jobFile, jobText, jobFileName));
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.style.display = "block";
+    setTimeout(() => { errorEl.style.display = "none"; }, 8000);
+  }
+
+  function setLoading(loading) {
+    submitBtn.disabled = loading;
+    spinner.style.display = loading ? "inline-block" : "none";
+    btnText.textContent = loading ? "Tailoring..." : "Tailor My Resume";
+  }
+
+  submitBtn.addEventListener("click", async () => {
+    const resume = resumeText.value.trim();
+    const job = jobText.value.trim();
+    if (!resume) { showError("Please enter your resume text."); return; }
+    if (!job) { showError("Please enter the job description."); return; }
+
+    errorEl.style.display = "none";
+    resultsEl.style.display = "none";
+    setLoading(true);
+
+    const form = new FormData();
+    form.append("resume", resume);
+    form.append("job_description", job);
+    form.append("include_cover_letter", document.getElementById("optCoverLetter").checked);
+    form.append("include_ats_score", document.getElementById("optAtsScore").checked);
+
+    try {
+      const res = await fetch("/api/tailor", { method: "POST", body: form });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        showError((errData && errData.detail) || "Server error (" + res.status + ")");
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      displayResults(data);
+    } catch (e) {
+      showError("Request failed: " + e.message);
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  function displayResults(data) {
+    document.getElementById("resumeContent").textContent = data.tailored_resume || "";
+    document.getElementById("changesContent").textContent = data.changes || "";
+
+    const atsResult = document.getElementById("atsResult");
+    if (data.ats_score) {
+      atsResult.style.display = "block";
+      const before = data.ats_score.before.score;
+      const after = data.ats_score.after.score;
+      const improvement = data.ats_score.improvement;
+      document.getElementById("atsBefore").textContent = before;
+      document.getElementById("atsAfter").textContent = after;
+      document.getElementById("atsImprovement").textContent = (improvement >= 0 ? "+" : "") + improvement;
+      document.getElementById("atsBeforeBar").style.width = Math.min(before, 100) + "%";
+      document.getElementById("atsAfterBar").style.width = Math.min(after, 100) + "%";
+    } else {
+      atsResult.style.display = "none";
+    }
+
+    const clResult = document.getElementById("coverLetterResult");
+    if (data.cover_letter) {
+      clResult.style.display = "block";
+      document.getElementById("coverLetterContent").textContent = data.cover_letter;
+    } else {
+      clResult.style.display = "none";
+    }
+
+    const usage = data.usage;
+    if (usage) {
+      document.getElementById("usageStats").innerHTML =
+        "<span>Model: " + usage.model + "</span>" +
+        "<span>Tokens: " + usage.total_tokens + "</span>" +
+        "<span>Time: " + usage.elapsed_seconds + "s</span>";
+    }
+
+    resultsEl.style.display = "block";
+    resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.classList.contains("copy-btn")) return;
+    const targetId = e.target.getAttribute("data-target");
+    const content = document.getElementById(targetId);
+    if (!content) return;
+    navigator.clipboard.writeText(content.textContent).then(() => {
+      e.target.classList.add("copied");
+      e.target.textContent = "Copied!";
+      setTimeout(() => {
+        e.target.classList.remove("copied");
+        e.target.textContent = "Copy";
+      }, 2000);
+    });
+  });
+})();
+</script>
+</body>
+</html>

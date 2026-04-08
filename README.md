@@ -100,6 +100,26 @@ You can also use Resume Tailor as a Telegram bot.
 3. Paste the job description or upload a file
 4. The bot returns your tailored resume and a summary of changes
 
+## Web Interface
+
+A browser-based UI for resume tailoring.
+
+### Setup
+
+```bash
+python run_web.py
+```
+
+Then open http://localhost:8000 in your browser.
+
+### Features
+
+- Paste or upload your resume and job description
+- One-click resume tailoring
+- Optional cover letter generation
+- Optional ATS keyword score analysis
+- Copy results to clipboard
+
 ## Example Output
 
 ```

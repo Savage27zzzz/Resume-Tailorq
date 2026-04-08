@@ -65,7 +65,7 @@ Examples:
 
     if result["changes"]:
         print("=" * 60)
-        print("CHANGES SUMMARY")
+        print("CHANGES MADE")
         print("=" * 60)
         print(result["changes"])
         print()

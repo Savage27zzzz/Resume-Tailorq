@@ -1,0 +1,63 @@
+Senior Software Engineer — NovaCraft Technologies
+
+Location: San Francisco, CA (Hybrid — 3 days in-office)
+Employment Type: Full-time
+Salary Range: $165,000 – $195,000
+
+---
+
+About NovaCraft
+
+NovaCraft Technologies is a fast-growing Series C startup building the next generation of cloud-native collaboration tools for enterprise teams. Our platform is used by over 2,000 companies worldwide and processes millions of events per day. We are backed by Tier 1 investors and are scaling our engineering team to support our next phase of growth.
+
+---
+
+About the Role
+
+We are looking for a Senior Software Engineer to join our Platform team. You will design, build, and maintain the core services that power our real-time collaboration engine. This is a high-impact role where you will own significant portions of the architecture and mentor junior engineers on the team.
+
+---
+
+Responsibilities
+
+- Design and implement scalable microservices using TypeScript and Node.js on AWS infrastructure
+- Build and optimize high-performance RESTful and GraphQL APIs serving millions of requests per day
+- Lead the development of real-time features using WebSockets and event-driven architecture
+- Architect and manage PostgreSQL databases, including schema design, query optimization, and migration strategies
+- Drive adoption of infrastructure-as-code practices using Terraform and AWS CDK
+- Collaborate with product managers and designers to translate requirements into technical specifications
+- Mentor junior engineers through code reviews, pair programming, and technical design sessions
+- Champion engineering best practices including CI/CD, automated testing, and observability
+
+---
+
+Requirements
+
+- 4+ years of professional software engineering experience
+- Strong proficiency in TypeScript and modern JavaScript (ES2020+)
+- Deep experience building and operating microservices at scale
+- Hands-on experience with AWS services (ECS, Lambda, RDS, SQS, CloudWatch)
+- Advanced knowledge of PostgreSQL including performance tuning and indexing strategies
+- Experience designing and consuming RESTful APIs and GraphQL endpoints
+- Solid understanding of containerization with Docker and orchestration concepts
+- Track record of improving system reliability, reducing latency, or increasing throughput with measurable results
+
+---
+
+Nice to Have
+
+- Experience with real-time systems (WebSockets, Server-Sent Events, pub/sub patterns)
+- Familiarity with infrastructure-as-code tools (Terraform, AWS CDK, Pulumi)
+- Contributions to open-source projects
+- Experience working in a high-growth startup environment
+
+---
+
+Benefits
+
+- Competitive salary + equity package
+- Health, dental, and vision insurance
+- Flexible PTO policy
+- $2,000 annual learning and development budget
+- Home office stipend
+- Weekly team lunches and quarterly offsites

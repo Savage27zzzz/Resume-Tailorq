@@ -79,9 +79,9 @@ TAILORED RESUME
 ...
 
 ============================================================
-CHANGES SUMMARY
+CHANGES MADE
 ============================================================
-### Top 5 Changes Made
+## CHANGES MADE
 
 1. **Reframed Summary for Platform Engineering**: Rewrote the professional
    summary to emphasize microservices, TypeScript, and cloud-native

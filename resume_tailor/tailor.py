@@ -36,6 +36,12 @@ def tailor_resume(resume_text: str, job_description: str, model: str = "gpt-4o")
     elapsed = time.time() - start_time
     raw_content = response.choices[0].message.content
 
+    if raw_content is None:
+        raise RuntimeError(
+            "OpenAI returned an empty response. This may be due to content filtering or an API error. "
+            "Try again or check your input for content policy violations."
+        )
+
     tailored_resume = _extract_section(raw_content, "---BEGIN RESUME---", "---END RESUME---")
     changes = _extract_section(raw_content, "---BEGIN CHANGES---", "---END CHANGES---")
 

@@ -215,6 +215,40 @@ Environment variables (set in `.env`):
 | `OPENAI_API_KEY` | *(required)* | Your OpenAI API key |
 | `OPENAI_MODEL` | `gpt-4o` | Default model when `--model` is not passed |
 
+## Deployment
+
+### Web UI on Vercel
+
+1. Fork or push this repo to GitHub
+2. Go to [vercel.com](https://vercel.com) and import the repository
+3. Add environment variables in the Vercel dashboard:
+   - `OPENAI_API_KEY` — your OpenAI API key
+   - `OPENAI_MODEL` — model to use (default: `gpt-4o`)
+   - `RATE_LIMIT_PER_HOUR` — max requests per IP per hour (default: `20`)
+4. Deploy — Vercel auto-detects the config from `vercel.json`
+
+### Telegram Bot on Railway
+
+1. Go to [railway.app](https://railway.app) and create a new project
+2. Connect your GitHub repo
+3. Add environment variables:
+   - `OPENAI_API_KEY` — your OpenAI API key
+   - `TELEGRAM_BOT_TOKEN` — your bot token from @BotFather
+   - `OPENAI_MODEL` — model to use (default: `gpt-4o`)
+4. Railway auto-detects the Dockerfile and deploys
+
+### Docker (anywhere)
+
+```bash
+docker build -t resume-tailor .
+
+# Run Telegram bot
+docker run -d --env-file .env resume-tailor
+
+# Run web UI instead
+docker run -d --env-file .env -p 8000:8000 resume-tailor python run_web.py
+```
+
 ## License
 
 MIT

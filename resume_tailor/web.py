@@ -1,9 +1,12 @@
 import os
 import asyncio
 import logging
+import time
+from collections import defaultdict
 from pathlib import Path
 
 from fastapi import FastAPI, UploadFile, File, Form, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
@@ -25,6 +28,32 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Resume Tailor", description="AI-powered resume tailoring")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Simple in-memory rate limiter
+_rate_limit_store: dict[str, list[float]] = defaultdict(list)
+RATE_LIMIT = int(os.environ.get("RATE_LIMIT_PER_HOUR", "20"))
+
+
+def _check_rate_limit(client_ip: str) -> bool:
+    """Return True if the client is within rate limits."""
+    now = time.time()
+    window = 3600  # 1 hour
+    # Clean old entries
+    _rate_limit_store[client_ip] = [
+        t for t in _rate_limit_store[client_ip] if now - t < window
+    ]
+    if len(_rate_limit_store[client_ip]) >= RATE_LIMIT:
+        return False
+    _rate_limit_store[client_ip].append(now)
+    return True
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
@@ -40,11 +69,19 @@ async def home(request: Request):
 
 @app.post("/api/tailor")
 async def api_tailor(
+    request: Request,
     resume: str = Form(...),
     job_description: str = Form(...),
     include_cover_letter: bool = Form(False),
     include_ats_score: bool = Form(False),
 ):
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip):
+        return JSONResponse(
+            {"error": "Rate limit exceeded. Please try again later."},
+            status_code=429,
+        )
+
     model = os.environ.get("OPENAI_MODEL", "gpt-4o")
 
     try:

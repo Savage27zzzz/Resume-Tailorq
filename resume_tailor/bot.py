@@ -17,6 +17,7 @@ import fitz  # pymupdf
 from .tailor import tailor_resume
 from .cover_letter import generate_cover_letter
 from .ats_score import compute_ats_score
+from .export import markdown_to_pdf
 
 logger = logging.getLogger(__name__)
 
@@ -180,6 +181,13 @@ async def _process_tailoring(update: Update, context: ContextTypes.DEFAULT_TYPE,
         for chunk in split_message(result["changes"]):
             await update.message.reply_text(chunk)
 
+    pdf_bytes = markdown_to_pdf(result["tailored_resume"])
+    await update.message.reply_document(
+        document=pdf_bytes,
+        filename="tailored_resume.pdf",
+        caption="📎 Here's your tailored resume as a PDF",
+    )
+
     context.user_data.clear()
     return ConversationHandler.END
 
@@ -260,6 +268,13 @@ async def _process_cover_letter(update: Update, context: ContextTypes.DEFAULT_TY
 
     for chunk in split_message(result["cover_letter"]):
         await update.message.reply_text(chunk)
+
+    cl_pdf_bytes = markdown_to_pdf(result["cover_letter"])
+    await update.message.reply_document(
+        document=cl_pdf_bytes,
+        filename="cover_letter.pdf",
+        caption="📎 Here's your cover letter as a PDF",
+    )
 
     context.user_data.clear()
     return ConversationHandler.END

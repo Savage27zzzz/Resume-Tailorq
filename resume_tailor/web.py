@@ -81,6 +81,30 @@ async def api_tailor(
     return JSONResponse(response)
 
 
+@app.post("/api/export")
+async def api_export(
+    content: str = Form(...),
+    format: str = Form("pdf"),
+):
+    from .export import markdown_to_pdf, markdown_to_docx
+    from fastapi.responses import Response
+
+    if format == "docx":
+        file_bytes = markdown_to_docx(content)
+        media_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        filename = "tailored_resume.docx"
+    else:
+        file_bytes = markdown_to_pdf(content)
+        media_type = "application/pdf"
+        filename = "tailored_resume.pdf"
+
+    return Response(
+        content=file_bytes,
+        media_type=media_type,
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+
 @app.post("/api/upload")
 async def api_upload(file: UploadFile = File(...)):
     content = await file.read()

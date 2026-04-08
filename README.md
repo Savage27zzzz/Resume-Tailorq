@@ -7,6 +7,7 @@ A Python CLI tool that uses OpenAI to intelligently rewrite your resume for a sp
 - **AI-powered tailoring** — rewrites your resume to mirror the language and requirements of a target job posting
 - **Cover letter generation** — generates a tailored cover letter from your resume and the job description
 - **ATS keyword scoring** — computes keyword overlap between your resume and the job description (before and after tailoring)
+- **Export to PDF and DOCX** — save your tailored resume and cover letter as formatted PDF or DOCX files
 - **ATS optimization** — matches keywords, action verbs, and phrasing from the job description
 - **Change transparency** — outputs the top 5 changes made and explains why each was applied
 - **Markdown in, markdown out** — reads and writes clean markdown resumes
@@ -47,6 +48,7 @@ python -m resume_tailor --resume <resume_file> --job <job_description_file>
 | `--verbose` | `-v` | No | Print token usage and timing info |
 | `--cover-letter` | `-c` | No | Also generate a tailored cover letter (saved to `output/cover_letter.md`) |
 | `--ats-score` | `-a` | No | Show ATS keyword match score before and after tailoring |
+| `--format` | `-f` | No | Output format: `md` (default), `pdf`, or `docx` |
 
 ### Examples
 
@@ -88,6 +90,18 @@ Combine all features:
 
 ```bash
 python -m resume_tailor -r my_resume.md -j job_posting.txt -a -c -v
+```
+
+Export as PDF:
+
+```bash
+python -m resume_tailor -r my_resume.md -j job_posting.txt -f pdf
+```
+
+Export as DOCX:
+
+```bash
+python -m resume_tailor -r my_resume.md -j job_posting.txt -f docx
 ```
 
 ## Telegram Bot

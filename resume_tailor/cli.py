@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from .tailor import tailor_resume
 from .cover_letter import generate_cover_letter
 from .ats_score import compute_ats_score
+from .export import markdown_to_docx, markdown_to_pdf
 
 
 def main():
@@ -22,6 +23,8 @@ Examples:
   python -m resume_tailor -r my_resume.md -j job_posting.txt --ats-score
   python -m resume_tailor -r my_resume.md -j job_posting.txt --cover-letter
   python -m resume_tailor -r my_resume.md -j job_posting.txt -a -c -v
+  python -m resume_tailor -r my_resume.md -j job_posting.txt -f pdf
+  python -m resume_tailor -r my_resume.md -j job_posting.txt -f docx
         """
     )
 
@@ -32,6 +35,8 @@ Examples:
     parser.add_argument("-v", "--verbose", action="store_true", help="Print token usage and timing info")
     parser.add_argument("-c", "--cover-letter", action="store_true", help="Also generate a tailored cover letter")
     parser.add_argument("-a", "--ats-score", action="store_true", help="Show ATS keyword match score before and after tailoring")
+    parser.add_argument("-f", "--format", choices=["md", "pdf", "docx"], default="md",
+                        help="Output format: md (default), pdf, or docx")
 
     args = parser.parse_args()
 
@@ -59,13 +64,23 @@ Examples:
     result = tailor_resume(resume_text, job_text, model)
 
     output_path = Path(args.output)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    full_output = result["tailored_resume"]
-    if result["changes"]:
-        full_output += "\n\n---\n\n" + result["changes"]
-
-    output_path.write_text(full_output, encoding="utf-8")
+    if args.format == "pdf":
+        output_path = output_path.with_suffix(".pdf")
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        pdf_bytes = markdown_to_pdf(result["tailored_resume"])
+        output_path.write_bytes(pdf_bytes)
+    elif args.format == "docx":
+        output_path = output_path.with_suffix(".docx")
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        docx_bytes = markdown_to_docx(result["tailored_resume"])
+        output_path.write_bytes(docx_bytes)
+    else:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        full_output = result["tailored_resume"]
+        if result["changes"]:
+            full_output += "\n\n---\n\n" + result["changes"]
+        output_path.write_text(full_output, encoding="utf-8")
 
     print("=" * 60)
     print("TAILORED RESUME")
@@ -80,7 +95,7 @@ Examples:
         print(result["changes"])
         print()
 
-    print(f"✅ Tailored resume saved to: {args.output}")
+    print(f"✅ Tailored resume saved to: {output_path}")
 
     if args.verbose:
         usage = result["usage"]
@@ -112,8 +127,15 @@ Examples:
         cl_result = generate_cover_letter(resume_text, job_text, model)
 
         output_dir = output_path.parent
-        cl_output_path = output_dir / "cover_letter.md"
-        cl_output_path.write_text(cl_result["cover_letter"], encoding="utf-8")
+        if args.format == "pdf":
+            cl_output_path = output_dir / "cover_letter.pdf"
+            cl_output_path.write_bytes(markdown_to_pdf(cl_result["cover_letter"]))
+        elif args.format == "docx":
+            cl_output_path = output_dir / "cover_letter.docx"
+            cl_output_path.write_bytes(markdown_to_docx(cl_result["cover_letter"]))
+        else:
+            cl_output_path = output_dir / "cover_letter.md"
+            cl_output_path.write_text(cl_result["cover_letter"], encoding="utf-8")
 
         print("=" * 60)
         print("COVER LETTER")

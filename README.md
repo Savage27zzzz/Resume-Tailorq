@@ -96,7 +96,7 @@ You can also use Resume Tailor as a Telegram bot.
 ### How It Works
 
 1. Send `/tailor` to the bot
-2. Paste your resume as text or upload a `.txt` / `.md` file
+2. Paste your resume as text or upload a `.txt`, `.md`, or `.pdf` file
 3. Paste the job description or upload a file
 4. The bot returns your tailored resume and a summary of changes
 

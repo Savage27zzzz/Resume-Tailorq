@@ -37,7 +37,7 @@ def split_message(text: str, max_length: int = 4096) -> list[str]:
             split_idx = max_length
         chunks.append(text[:split_idx])
         text = text[split_idx:].lstrip("\n")
-    return chunks
+    return [c for c in chunks if c]
 
 
 async def _read_document(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str | None:

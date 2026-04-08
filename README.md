@@ -2,6 +2,8 @@
 
 A Python CLI tool that uses OpenAI to intelligently rewrite your resume for a specific job description. It maximizes keyword alignment, reorders experience by relevance, quantifies achievements, and optimizes for ATS — while keeping your authentic voice intact.
 
+> **💡 Free to use!** Set `AI_PROVIDER=gemini` with a [free Gemini API key](https://aistudio.google.com/apikey) — no credit card required.
+
 ## Features
 
 - **AI-powered tailoring** — rewrites your resume to mirror the language and requirements of a target job posting
@@ -11,13 +13,15 @@ A Python CLI tool that uses OpenAI to intelligently rewrite your resume for a sp
 - **ATS optimization** — matches keywords, action verbs, and phrasing from the job description
 - **Change transparency** — outputs the top 5 changes made and explains why each was applied
 - **Markdown in, markdown out** — reads and writes clean markdown resumes
-- **Configurable model** — use any OpenAI chat model (`gpt-4o`, `gpt-4o-mini`, etc.)
+- **Configurable model** — use any OpenAI chat model (`gpt-4o`, `gpt-4o-mini`, etc.) or Google Gemini (`gemini-2.0-flash`)
 - **Verbose mode** — view token usage, cost estimates, and timing stats
 
 ## Prerequisites
 
 - Python 3.9+
-- An [OpenAI API key](https://platform.openai.com/api-keys)
+- An AI API key (choose one):
+  - [OpenAI API key](https://platform.openai.com/api-keys) (paid)
+  - [Google Gemini API key](https://aistudio.google.com/apikey) (free tier available)
 
 ## Installation
 
@@ -28,7 +32,9 @@ cd Resume-Tailorq
 pip install -r requirements.txt
 
 cp .env.example .env
-# Edit .env and add your OpenAI API key
+# Edit .env:
+#   For OpenAI: set AI_PROVIDER=openai and OPENAI_API_KEY=your-key
+#   For Gemini (free): set AI_PROVIDER=gemini and GEMINI_API_KEY=your-key
 ```
 
 ## Usage
@@ -212,8 +218,12 @@ Environment variables (set in `.env`):
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `OPENAI_API_KEY` | *(required)* | Your OpenAI API key |
-| `OPENAI_MODEL` | `gpt-4o` | Default model when `--model` is not passed |
+| `AI_PROVIDER` | `openai` | AI backend: `openai` or `gemini` |
+| `OPENAI_API_KEY` | *(required for openai)* | Your OpenAI API key |
+| `GEMINI_API_KEY` | *(required for gemini)* | Your Google Gemini API key ([free](https://aistudio.google.com/apikey)) |
+| `AI_MODEL` | auto | Model override (default: `gpt-4o` for OpenAI, `gemini-2.0-flash` for Gemini) |
+| `TELEGRAM_BOT_TOKEN` | — | Telegram bot token from @BotFather |
+| `RATE_LIMIT_PER_HOUR` | `20` | Max API requests per IP per hour (web UI only) |
 
 ## Deployment
 

@@ -1,6 +1,6 @@
 import os
 import time
-from openai import OpenAI
+from .client import get_client
 from .prompts import COVER_LETTER_SYSTEM_PROMPT, COVER_LETTER_PROMPT
 
 
@@ -13,7 +13,7 @@ def generate_cover_letter(resume_text: str, job_description: str, model: str = "
             - "cover_letter": str (the generated cover letter in markdown)
             - "usage": dict with token counts and timing
     """
-    client = OpenAI()
+    client = get_client()
 
     user_prompt = COVER_LETTER_PROMPT.format(
         resume=resume_text,

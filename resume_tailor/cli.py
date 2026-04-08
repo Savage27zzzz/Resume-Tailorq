@@ -3,6 +3,7 @@ import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
+from .client import get_default_model
 from .tailor import tailor_resume
 from .cover_letter import generate_cover_letter
 from .ats_score import compute_ats_score
@@ -47,14 +48,20 @@ Examples:
         print(f"Error: Job description file not found: {args.job}", file=sys.stderr)
         sys.exit(1)
 
-    if not os.environ.get("OPENAI_API_KEY"):
-        print("Error: OPENAI_API_KEY not set. Copy .env.example to .env and add your key.", file=sys.stderr)
-        sys.exit(1)
+    provider = os.environ.get("AI_PROVIDER", "openai").lower()
+    if provider == "gemini":
+        if not os.environ.get("GEMINI_API_KEY"):
+            print("Error: GEMINI_API_KEY not set. Add it to your .env file.", file=sys.stderr)
+            sys.exit(1)
+    else:
+        if not os.environ.get("OPENAI_API_KEY"):
+            print("Error: OPENAI_API_KEY not set. Add it to your .env file.", file=sys.stderr)
+            sys.exit(1)
 
     resume_text = Path(args.resume).read_text(encoding="utf-8")
     job_text = Path(args.job).read_text(encoding="utf-8")
 
-    model = args.model or os.environ.get("OPENAI_MODEL", "gpt-4o")
+    model = args.model or get_default_model()
 
     if args.ats_score:
         before_ats = compute_ats_score(resume_text, job_text)

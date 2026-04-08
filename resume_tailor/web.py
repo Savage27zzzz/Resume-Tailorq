@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
+from .client import get_default_model
 from .tailor import tailor_resume
 
 try:
@@ -82,7 +83,7 @@ async def api_tailor(
             status_code=429,
         )
 
-    model = os.environ.get("OPENAI_MODEL", "gpt-4o")
+    model = get_default_model()
 
     try:
         result = await asyncio.to_thread(tailor_resume, resume, job_description, model)

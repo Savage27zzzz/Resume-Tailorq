@@ -23,9 +23,15 @@ def main():
         print("Error: TELEGRAM_BOT_TOKEN not set. Add it to your .env file.", file=sys.stderr)
         sys.exit(1)
 
-    if not os.environ.get("OPENAI_API_KEY"):
-        print("Error: OPENAI_API_KEY not set. Add it to your .env file.", file=sys.stderr)
-        sys.exit(1)
+    provider = os.environ.get("AI_PROVIDER", "openai").lower()
+    if provider == "gemini":
+        if not os.environ.get("GEMINI_API_KEY"):
+            print("Error: GEMINI_API_KEY not set. Add it to your .env file.", file=sys.stderr)
+            sys.exit(1)
+    else:
+        if not os.environ.get("OPENAI_API_KEY"):
+            print("Error: OPENAI_API_KEY not set. Add it to your .env file.", file=sys.stderr)
+            sys.exit(1)
 
     print("🤖 Resume Tailor Bot starting...")
     app = create_bot_app(token)

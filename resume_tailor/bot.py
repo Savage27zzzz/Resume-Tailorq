@@ -14,6 +14,7 @@ from telegram.ext import (
 
 import fitz  # pymupdf
 
+from .client import get_default_model
 from .tailor import tailor_resume
 from .cover_letter import generate_cover_letter
 from .ats_score import compute_ats_score
@@ -152,7 +153,7 @@ async def receive_resume_document(update: Update, context: ContextTypes.DEFAULT_
 async def _process_tailoring(update: Update, context: ContextTypes.DEFAULT_TYPE, job_text: str):
     """Run the tailoring logic and send results back to the user."""
     resume_text = context.user_data.get("resume", "")
-    model = os.environ.get("OPENAI_MODEL", "gpt-4o")
+    model = get_default_model()
 
     await update.message.reply_text("⏳ Tailoring your resume...")
 
@@ -244,7 +245,7 @@ async def cl_receive_resume_document(update: Update, context: ContextTypes.DEFAU
 async def _process_cover_letter(update: Update, context: ContextTypes.DEFAULT_TYPE, job_text: str):
     """Run cover letter generation and send results back to the user."""
     resume_text = context.user_data.get("resume", "")
-    model = os.environ.get("OPENAI_MODEL", "gpt-4o")
+    model = get_default_model()
 
     await update.message.reply_text("⏳ Generating your cover letter...")
 

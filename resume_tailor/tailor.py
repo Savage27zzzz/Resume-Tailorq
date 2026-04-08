@@ -1,6 +1,6 @@
 import os
 import time
-from openai import OpenAI
+from .client import get_client
 from .prompts import SYSTEM_PROMPT, TAILOR_PROMPT
 
 
@@ -14,7 +14,7 @@ def tailor_resume(resume_text: str, job_description: str, model: str = "gpt-4o")
             - "changes": str (the top 5 changes explanation)
             - "usage": dict with token counts and timing
     """
-    client = OpenAI()
+    client = get_client()
 
     user_prompt = TAILOR_PROMPT.format(
         resume=resume_text,

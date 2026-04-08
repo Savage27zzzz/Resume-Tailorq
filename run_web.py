@@ -16,9 +16,15 @@ def main():
         level=logging.INFO,
     )
 
-    if not os.environ.get("OPENAI_API_KEY"):
-        print("Error: OPENAI_API_KEY not set. Add it to your .env file.", file=sys.stderr)
-        sys.exit(1)
+    provider = os.environ.get("AI_PROVIDER", "openai").lower()
+    if provider == "gemini":
+        if not os.environ.get("GEMINI_API_KEY"):
+            print("Error: GEMINI_API_KEY not set. Add it to your .env file.", file=sys.stderr)
+            sys.exit(1)
+    else:
+        if not os.environ.get("OPENAI_API_KEY"):
+            print("Error: OPENAI_API_KEY not set. Add it to your .env file.", file=sys.stderr)
+            sys.exit(1)
 
     import uvicorn
     print("\U0001f310 Resume Tailor Web starting at http://localhost:8000")

@@ -47,7 +47,13 @@ async def api_tailor(
 ):
     model = os.environ.get("OPENAI_MODEL", "gpt-4o")
 
-    result = await asyncio.to_thread(tailor_resume, resume, job_description, model)
+    try:
+        result = await asyncio.to_thread(tailor_resume, resume, job_description, model)
+    except RuntimeError as exc:
+        return JSONResponse({"error": str(exc)}, status_code=502)
+    except Exception:
+        logger.exception("Unexpected error during tailoring")
+        return JSONResponse({"error": "Something went wrong. Please try again."}, status_code=500)
 
     response = {
         "tailored_resume": result["tailored_resume"],
@@ -56,8 +62,12 @@ async def api_tailor(
     }
 
     if include_cover_letter and HAS_COVER_LETTER:
-        cl_result = await asyncio.to_thread(generate_cover_letter, resume, job_description, model)
-        response["cover_letter"] = cl_result["cover_letter"]
+        try:
+            cl_result = await asyncio.to_thread(generate_cover_letter, resume, job_description, model)
+            response["cover_letter"] = cl_result["cover_letter"]
+        except Exception:
+            logger.exception("Cover letter generation failed")
+            response["cover_letter_error"] = "Cover letter generation failed."
 
     if include_ats_score and HAS_ATS_SCORE:
         before = compute_ats_score(resume, job_description)
@@ -74,6 +84,11 @@ async def api_tailor(
 @app.post("/api/upload")
 async def api_upload(file: UploadFile = File(...)):
     content = await file.read()
+
+    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+    if len(content) > MAX_FILE_SIZE:
+        return JSONResponse({"error": "File too large. Maximum size is 10 MB."}, status_code=400)
+
     filename = (file.filename or "").lower()
 
     if filename.endswith(".pdf"):

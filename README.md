@@ -68,6 +68,38 @@ Verbose mode for debugging:
 python -m resume_tailor -r my_resume.md -j job_posting.txt -v
 ```
 
+## Telegram Bot
+
+You can also use Resume Tailor as a Telegram bot.
+
+### Setup
+
+1. Create a bot via [@BotFather](https://t.me/BotFather) on Telegram and copy the token
+2. Add the token to your `.env` file:
+   ```
+   TELEGRAM_BOT_TOKEN=your-token-here
+   ```
+3. Start the bot:
+   ```bash
+   python run_bot.py
+   ```
+
+### Bot Commands
+
+| Command | Description |
+|---------|-------------|
+| `/start` | Welcome message and usage instructions |
+| `/tailor` | Start a new resume tailoring session |
+| `/help` | Show usage instructions |
+| `/cancel` | Cancel the current session |
+
+### How It Works
+
+1. Send `/tailor` to the bot
+2. Paste your resume as text or upload a `.txt` / `.md` file
+3. Paste the job description or upload a file
+4. The bot returns your tailored resume and a summary of changes
+
 ## Example Output
 
 ```

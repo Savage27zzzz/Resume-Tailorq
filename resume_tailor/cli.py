@@ -4,6 +4,8 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 from .tailor import tailor_resume
+from .cover_letter import generate_cover_letter
+from .ats_score import compute_ats_score
 
 
 def main():
@@ -17,6 +19,9 @@ Examples:
   python -m resume_tailor -r my_resume.md -j job_posting.txt
   python -m resume_tailor -r my_resume.md -j job_posting.txt -o tailored.md
   python -m resume_tailor -r my_resume.md -j job_posting.txt -m gpt-4o -v
+  python -m resume_tailor -r my_resume.md -j job_posting.txt --ats-score
+  python -m resume_tailor -r my_resume.md -j job_posting.txt --cover-letter
+  python -m resume_tailor -r my_resume.md -j job_posting.txt -a -c -v
         """
     )
 
@@ -25,6 +30,8 @@ Examples:
     parser.add_argument("-o", "--output", default="output/tailored_resume.md", help="Output file path (default: output/tailored_resume.md)")
     parser.add_argument("-m", "--model", default=None, help="OpenAI model (default: OPENAI_MODEL env var or gpt-4o)")
     parser.add_argument("-v", "--verbose", action="store_true", help="Print token usage and timing info")
+    parser.add_argument("-c", "--cover-letter", action="store_true", help="Also generate a tailored cover letter")
+    parser.add_argument("-a", "--ats-score", action="store_true", help="Show ATS keyword match score before and after tailoring")
 
     args = parser.parse_args()
 
@@ -43,6 +50,9 @@ Examples:
     job_text = Path(args.job).read_text(encoding="utf-8")
 
     model = args.model or os.environ.get("OPENAI_MODEL", "gpt-4o")
+
+    if args.ats_score:
+        before_ats = compute_ats_score(resume_text, job_text)
 
     print(f"🔄 Tailoring resume for job description using {model}...\n")
 
@@ -80,6 +90,46 @@ Examples:
         print(f"   Completion tokens: {usage['completion_tokens']}")
         print(f"   Total tokens: {usage['total_tokens']}")
         print(f"   Time: {usage['elapsed_seconds']}s")
+
+    if args.ats_score:
+        after_ats = compute_ats_score(result["tailored_resume"], job_text)
+        improvement = after_ats["score"] - before_ats["score"]
+
+        print()
+        print("=" * 60)
+        print("ATS KEYWORD SCORE")
+        print("=" * 60)
+        print(f"Before tailoring:  {before_ats['score']}% ({len(before_ats['matched_keywords'])}/{before_ats['total_jd_keywords']} keywords)")
+        print(f"After tailoring:   {after_ats['score']}% ({len(after_ats['matched_keywords'])}/{after_ats['total_jd_keywords']} keywords)")
+        print(f"Improvement:       +{improvement}%")
+
+        if after_ats["missing_keywords"]:
+            print(f"\nMissing keywords: {', '.join(after_ats['missing_keywords'])}")
+
+    if args.cover_letter:
+        print(f"\n🔄 Generating cover letter using {model}...\n")
+
+        cl_result = generate_cover_letter(resume_text, job_text, model)
+
+        output_dir = output_path.parent
+        cl_output_path = output_dir / "cover_letter.md"
+        cl_output_path.write_text(cl_result["cover_letter"], encoding="utf-8")
+
+        print("=" * 60)
+        print("COVER LETTER")
+        print("=" * 60)
+        print(cl_result["cover_letter"])
+        print()
+        print(f"✅ Cover letter saved to: {cl_output_path}")
+
+        if args.verbose:
+            cl_usage = cl_result["usage"]
+            print(f"\n📊 Cover Letter Usage Stats:")
+            print(f"   Model: {cl_usage['model']}")
+            print(f"   Prompt tokens: {cl_usage['prompt_tokens']}")
+            print(f"   Completion tokens: {cl_usage['completion_tokens']}")
+            print(f"   Total tokens: {cl_usage['total_tokens']}")
+            print(f"   Time: {cl_usage['elapsed_seconds']}s")
 
 
 if __name__ == "__main__":

@@ -5,6 +5,8 @@ A Python CLI tool that uses OpenAI to intelligently rewrite your resume for a sp
 ## Features
 
 - **AI-powered tailoring** — rewrites your resume to mirror the language and requirements of a target job posting
+- **Cover letter generation** — generates a tailored cover letter from your resume and the job description
+- **ATS keyword scoring** — computes keyword overlap between your resume and the job description (before and after tailoring)
 - **ATS optimization** — matches keywords, action verbs, and phrasing from the job description
 - **Change transparency** — outputs the top 5 changes made and explains why each was applied
 - **Markdown in, markdown out** — reads and writes clean markdown resumes
@@ -43,6 +45,8 @@ python -m resume_tailor --resume <resume_file> --job <job_description_file>
 | `--output` | `-o` | No | Output file path (default: `output/tailored_resume.md`) |
 | `--model` | `-m` | No | OpenAI model to use (default: `OPENAI_MODEL` env var or `gpt-4o`) |
 | `--verbose` | `-v` | No | Print token usage and timing info |
+| `--cover-letter` | `-c` | No | Also generate a tailored cover letter (saved to `output/cover_letter.md`) |
+| `--ats-score` | `-a` | No | Show ATS keyword match score before and after tailoring |
 
 ### Examples
 
@@ -68,6 +72,24 @@ Verbose mode for debugging:
 python -m resume_tailor -r my_resume.md -j job_posting.txt -v
 ```
 
+Generate a cover letter alongside the tailored resume:
+
+```bash
+python -m resume_tailor -r my_resume.md -j job_posting.txt --cover-letter
+```
+
+Show ATS keyword score before and after tailoring:
+
+```bash
+python -m resume_tailor -r my_resume.md -j job_posting.txt --ats-score
+```
+
+Combine all features:
+
+```bash
+python -m resume_tailor -r my_resume.md -j job_posting.txt -a -c -v
+```
+
 ## Telegram Bot
 
 You can also use Resume Tailor as a Telegram bot.
@@ -90,15 +112,17 @@ You can also use Resume Tailor as a Telegram bot.
 |---------|-------------|
 | `/start` | Welcome message and usage instructions |
 | `/tailor` | Start a new resume tailoring session |
+| `/coverletter` | Generate a tailored cover letter |
+| `/ats` | Check your ATS keyword score |
 | `/help` | Show usage instructions |
 | `/cancel` | Cancel the current session |
 
 ### How It Works
 
-1. Send `/tailor` to the bot
+1. Send `/tailor`, `/coverletter`, or `/ats` to the bot
 2. Paste your resume as text or upload a `.txt`, `.md`, or `.pdf` file
 3. Paste the job description or upload a file
-4. The bot returns your tailored resume and a summary of changes
+4. The bot returns your tailored resume, cover letter, or ATS score
 
 ## Example Output
 
@@ -125,6 +149,19 @@ CHANGES MADE
 ...
 
 ✅ Tailored resume saved to: output/tailored_resume.md
+```
+
+### ATS Score Output
+
+```
+============================================================
+ATS KEYWORD SCORE
+============================================================
+Before tailoring:  42.3% (22/52 keywords)
+After tailoring:   87.5% (45/52 keywords)
+Improvement:       +45.2%
+
+Missing keywords: terraform, aws cdk, graphql, websockets, pub/sub, event-driven, observability
 ```
 
 ## How It Works

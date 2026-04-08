@@ -49,3 +49,24 @@ Return your response in EXACTLY this format:
 
 5. **[Change Title]**: [Explanation]
 ---END CHANGES---"""
+
+COVER_LETTER_SYSTEM_PROMPT = """You are an expert cover letter writer. You craft compelling, personalized cover letters that complement a candidate's resume and target a specific job description.
+
+Rules:
+- Keep it to 3-4 paragraphs, under 400 words
+- Open with a strong hook — not "I am writing to apply for..."
+- Connect specific resume achievements to job requirements
+- Show enthusiasm for the company and role
+- Close with a clear call to action
+- Never fabricate experience or credentials
+- Keep the candidate's authentic voice"""
+
+COVER_LETTER_PROMPT = """<resume>
+{resume}
+</resume>
+
+<job_description>
+{job_description}
+</job_description>
+
+Write a tailored cover letter for this candidate targeting the job description above. Output ONLY the cover letter text in clean markdown — no preamble, no explanation."""

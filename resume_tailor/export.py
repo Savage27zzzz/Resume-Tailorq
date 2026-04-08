@@ -55,9 +55,29 @@ def _add_formatted_text(paragraph, text: str):
             paragraph.add_run(part)
 
 
+def _sanitize_for_pdf(text: str) -> str:
+    """Replace common non-Latin-1 characters for PDF compatibility."""
+    replacements = {
+        '\u2014': '--',   # em dash
+        '\u2013': '-',    # en dash
+        '\u2018': "'",    # left single quote
+        '\u2019': "'",    # right single quote
+        '\u201c': '"',    # left double quote
+        '\u201d': '"',    # right double quote
+        '\u2026': '...',  # ellipsis
+        '\u2022': '-',    # bullet
+        '\u00b7': '-',    # middle dot
+    }
+    for char, replacement in replacements.items():
+        text = text.replace(char, replacement)
+    return text.encode('latin-1', 'replace').decode('latin-1')
+
+
 def markdown_to_pdf(markdown_text: str) -> bytes:
     """Convert markdown text to a PDF file. Returns bytes."""
     from fpdf import FPDF
+
+    markdown_text = _sanitize_for_pdf(markdown_text)
 
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=20)
